@@ -28,4 +28,6 @@ Screenshots:
 
 ![World](https://github.com/alx2007/mc.js/blob/main/screenshots/2022-05-01%20(2).png)
 
+*Current performance is kinda garbage tho*
+
 ![Performance is kinda garbage tho](https://github.com/alx2007/mc.js/blob/main/screenshots/2022-05-01%20(3).png)
