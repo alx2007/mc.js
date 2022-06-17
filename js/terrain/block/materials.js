@@ -1,12 +1,16 @@
-const grass = "./textures/grassBlock/grassBlock";
+const src = "./textures/";
+const grass = `${src}grassBlock/grassBlock`;
 
 export const materials = {
   grassBlock : {
-    front : `${grass}Side.png`,
-    back : `${grass}Side.png`,
     top : `${grass}Top.jpg`,
     bottom : `${grass}Bottom.jpg`,
-    left : `${grass}Side.png`,
-    right : `${grass}Side.png`
-  }
+    side : `${grass}Side.png`
+  },
+
+  obsidian : `${src}obsidian.png`,
+
+  gold : `${src}gold.png`,
+
+  diamond : `${src}diamond.png`
 };
