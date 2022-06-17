@@ -4,14 +4,11 @@ import {Chunk} from "./terrain/chunk/chunk.js";
 
 export class World {
   constructor (x, y, z, worldX, worldZ) {
-    this.time = performance.now();
-    
+    this.pos = [0, 0, 0];
     this.initWorld();
     this.initControls();
 
     this.createChunks(x, y, z, worldX, worldZ);
-    
-    // this.cullFaces(x, y, z);
 
     this.camera.lookAt(0, 0, 0);
   };
@@ -19,12 +16,41 @@ export class World {
   createChunks (x, y, z, worldX, worldZ) {
     this.chunks = [];
 
-    for (let i = 0; i < worldZ; i++) {
+    for (let i = 0; i < worldX; i++) {
       this.chunks.push([]);
-      for (let j = 0; j < worldX; j++) {
-        const startX = -x + j * x;
-        const startZ = -z + i * z;
-        this.chunks.push(new Chunk(startX, startZ, x, y, z, this.scene));
+      for (let j = 0; j < worldZ; j++) {
+        const startX = (-x * worldX) / 2 + j * x + worldX;
+        const startZ = (-z * worldZ) / 2 + i * z + worldZ;
+        const chunk = new Chunk(startX, startZ, x, y, z, this.scene);
+        this.chunks[i].push(chunk);
+      };
+    };
+
+    for (let i = 0; i < worldX; i++) {
+      for (let j = 0; j < worldZ; j++) {
+        // neighbours are in the order of north, south, west, east
+        const neighbours = [undefined, undefined, undefined, undefined];
+
+        if (j > 0) {
+          neighbours[2] = this.chunks[i][j - 1];
+        };
+
+        if (j < worldZ - 1) {
+          neighbours[3] = this.chunks[i][j + 1];
+        };
+
+        if (i > 0) {
+          neighbours[0] = this.chunks[i - 1][j];
+        };
+
+        if (i < worldX - 1) {
+          neighbours[1] = this.chunks[i + 1][j];
+        };
+
+        this.chunks[i][j].neighbours = neighbours;
+        this.chunks[i][j].createFaces(this.chunks[i][j].x,
+                                      this.chunks[i][j].y,
+                                      this.chunks[i][j].z);
       };
     };
   };
@@ -32,7 +58,7 @@ export class World {
   initWorld () {
     this.scene = new THREE.Scene();
     
-    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
     this.camera.position.y = 10;
     this.scene.add(this.camera);
     
@@ -42,7 +68,7 @@ export class World {
   };
 
   initControls () {
-    this.speed = 0.2;
+    this.speed = 0.4;
     
     this.controls = new PointerLockControls(this.camera, this.renderer.domElement);
     
@@ -72,33 +98,6 @@ export class World {
           break;
       };
     });
-  };
-
-  round (num, nearest) {
-    let output = num / nearest;
-    output = Math.round(output);
-    output *= nearest;
-    return output;
-  };
-
-  pseudoNormalise (vec, mag) {
-    const vecMag = Math.sqrt(vec.x ** 2 + vec.y ** 2 + vec.z ** 2);
-    const scale = vecMag / mag;
-    vec.x /= scale;
-    vec.y /= scale;
-    vec.z /= scale;
-  };
-
-  getTargetedBlock () {
-    let interval = this.camera.rotaton;
-
-    let targetingBlock = false;
-
-    while (targetingBlock == false) {
-      const start = this.camera.rotation;
-      const next = start.add(interval);
-      interval.add(interval);
-    };
   };
   
   animate () {   
